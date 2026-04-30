@@ -222,3 +222,10 @@ Media ID Tracking – Incremental Load Logic
 
 <p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/s3%20media%20id%20update.png" width="750"/> </p>
 
+
+-  Glue Python Shell job ran successfully
+-   Wistia API token read from Secrets Manager
+-   checkpoint.json read and updated
+-   Both media IDs processed
+-  Raw JSON written to S3
+
