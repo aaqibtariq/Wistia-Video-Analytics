@@ -70,7 +70,7 @@ athena-results/
 - Click Create role
 - Make sure Go inside role → Trust relationships → Edit
 
-  ```json
+  ```
 {
   "Effect": "Allow",
   "Principal": {
@@ -82,7 +82,7 @@ athena-results/
 ```
 
 
-4. Athena Setup (Query Layer)
+# Athena Setup (Query Layer)
 
 - Go to AWS Athena
 - Click Query editor
