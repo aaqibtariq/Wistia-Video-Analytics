@@ -190,4 +190,35 @@ if __name__ == "__main__":
 -  Click:
 -  Run
 
+AWS Glue Job Creation – Step 1
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20job%20creation%201.png" width="750"/> </p>
+
+AWS Glue Job Creation – Step 2
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20job%20creation%202.png" width="750"/> </p>
+
+AWS Glue Job Creation – Step 3
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20job%20creation%203.png" width="750"/> </p>
+
+AWS Glue Job Creation – Step 4
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20job%20creation%204.png" width="750"/> </p>
+
+AWS Glue Job Execution Status
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20job%20status%20.png" width="750"/> </p>
+
+S3 Checkpoint Mechanism – State Tracking
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/S3%20checkpoint.png" width="750"/> </p>
+
+Checkpoint Updates – Incremental Processing
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/checkpoint%20update%20.png" width="750"/> </p>
+
+Media ID Tracking – Incremental Load Logic
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/s3%20media%20id%20update.png" width="750"/> </p>
 
