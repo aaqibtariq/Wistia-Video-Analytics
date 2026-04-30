@@ -29,6 +29,7 @@ athena-results/
 
 ```
 
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/S3%20bucket%20and%20folders.png" width="750"/> </p>
 
 #  Create Secrets Manager Secret (Wistia API)
 
@@ -46,7 +47,7 @@ athena-results/
 - Disable rotation (for now)
 - Click Next → Store
 
-
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/secret%20manager.png" width="750"/> </p>
 
 # Create Glue IAM Role
 
@@ -81,6 +82,8 @@ athena-results/
 
 ```
 
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20role.png" width="750"/> </p>
+
 
 # Athena Setup (Query Layer)
 
@@ -97,3 +100,9 @@ athena-results/
 -  Verify
     -  SHOW DATABASES;
 
+
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/athena%20database.png" width="750"/> </p>
+
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/athena%20location.png" width="750"/> </p>
