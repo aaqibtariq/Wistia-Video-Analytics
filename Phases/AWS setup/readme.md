@@ -70,7 +70,7 @@ athena-results/
 - Click Create role
 - Make sure Go inside role → Trust relationships → Edit
 
-  ```
+```
 {
   "Effect": "Allow",
   "Principal": {
