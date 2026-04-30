@@ -29,6 +29,8 @@ athena-results/
 
 ```
 
+- Upload checkpoint.json file under state/
+
 <p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/S3%20bucket%20and%20folders.png" width="750"/> </p>
 
 #  Create Secrets Manager Secret (Wistia API)
