@@ -189,5 +189,19 @@ s3://wistia-video-analytics-at/scripts/wistia_transform_delta.py
         - spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog
 
 
+AWS Glue Job – Execution Progress
 
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/Glue%20job%20progress.png" width="750"/> </p>
+
+Amazon Athena – Analytics Tables
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/Athena%20tables.png" width="750"/> </p>
+
+Initial Data Load – First Pipeline Execution
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/first%20load.png" width="750"/> </p>
+
+Incremental Data Load – Second Pipeline Execution
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/second%20load.png" width="750"/> </p>
 
