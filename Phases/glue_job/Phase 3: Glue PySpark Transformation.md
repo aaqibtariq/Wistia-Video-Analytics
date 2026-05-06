@@ -109,4 +109,33 @@ print("Transformation completed successfully")
 
 s3://wistia-video-analytics-at/scripts/wistia_transform_delta.py
 
-## 
+## Create Glue Job
+
+- AWS Glue → ETL jobs → Create job → Script editor
+
+- Choose:
+    - Spark
+- Job name:
+    - wistia_transform_delta
+- IAM role:
+    - GlueExecutionRole-Wistia
+- Glue version:
+    - Glue 5.0 or 5.1
+- Worker type:
+    - G.1X
+- Number of workers:
+    - 2
+- Script path:
+    - s3://wistia-video-analytics-at/scripts/wistia_transform_delta.py
+- Add job parameters
+    - Add:
+        - --S3_BUCKET
+        - wistia-video-analytics-at
+        - --datalake-formats
+        - delta
+        - --conf
+        - spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog
+
+
+
+
