@@ -5,7 +5,8 @@ raw JSON → bronze Delta → silver Delta → gold Delta
 ```python
 
 import sys
-from datetime import datetime
+import re
+import boto3
 from awsglue.utils import getResolvedOptions
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
@@ -27,8 +28,33 @@ args = getResolvedOptions(
 
 S3_BUCKET = args["S3_BUCKET"]
 
-# Dynamic load date generated automatically at runtime
-LOAD_DATE = datetime.utcnow().strftime("%Y-%m-%d")
+s3_client = boto3.client("s3")
+
+
+def get_latest_load_date(bucket):
+    prefix = "raw/media_stats/"
+
+    response = s3_client.list_objects_v2(
+        Bucket=bucket,
+        Prefix=prefix,
+        Delimiter="/"
+    )
+
+    load_dates = []
+
+    for item in response.get("CommonPrefixes", []):
+        folder = item["Prefix"]
+        match = re.search(r"load_date=(\d{4}-\d{2}-\d{2})", folder)
+        if match:
+            load_dates.append(match.group(1))
+
+    if not load_dates:
+        raise Exception("No raw load_date partitions found in S3")
+
+    return sorted(load_dates)[-1]
+
+
+LOAD_DATE = get_latest_load_date(S3_BUCKET)
 
 spark = (
     SparkSession.builder
@@ -39,6 +65,7 @@ spark = (
 )
 
 raw_path = f"s3://{S3_BUCKET}/raw/media_stats/load_date={LOAD_DATE}/"
+
 bronze_path = f"s3://{S3_BUCKET}/bronze/media_stats/"
 silver_path = f"s3://{S3_BUCKET}/silver/media_stats/"
 gold_path = f"s3://{S3_BUCKET}/gold/fact_media_engagement/"
@@ -47,6 +74,15 @@ print(f"Starting transformation for LOAD_DATE={LOAD_DATE}")
 print(f"Reading raw data from: {raw_path}")
 
 raw_df = spark.read.option("multiline", "true").json(raw_path)
+
+print("===== RAW DATA SCHEMA =====")
+raw_df.printSchema()
+
+print("===== RAW DATA COLUMNS =====")
+print(raw_df.columns)
+
+print("===== SAMPLE RAW DATA =====")
+raw_df.show(5, truncate=False)
 
 bronze_df = (
     raw_df
@@ -63,7 +99,7 @@ bronze_df.write.format("delta") \
 
 silver_df = (
     bronze_df
-    .dropDuplicates()
+    .dropDuplicates(["media_id"])
     .withColumn("processed_timestamp", current_timestamp())
 )
 
@@ -76,21 +112,35 @@ silver_df.write.format("delta") \
 
 gold_df = (
     silver_df
+    .select(
+        col("media_id"),
+        col("play_count"),
+        col("play_rate"),
+        col("engagement"),
+        col("hours_watched"),
+        col("visitors"),
+        lit(LOAD_DATE).alias("load_date")
+    )
     .withColumn("engagement_date", to_date(lit(LOAD_DATE)))
     .withColumn(
         "surrogate_key",
         sha2(
             concat_ws(
                 "||",
-                col("hashed_id").cast("string"),
-                col("name").cast("string"),
-                lit(LOAD_DATE)
+                col("media_id").cast("string"),
+                col("engagement_date").cast("string")
             ),
             256
         )
     )
     .withColumn("load_timestamp", current_timestamp())
 )
+
+print("===== GOLD DATA SCHEMA =====")
+gold_df.printSchema()
+
+print("===== SAMPLE GOLD DATA =====")
+gold_df.show(5, truncate=False)
 
 print("Writing Gold Delta table")
 
@@ -125,6 +175,8 @@ s3://wistia-video-analytics-at/scripts/wistia_transform_delta.py
     - G.1X
 - Number of workers:
     - 2
+- Timeout
+    - 30 min
 - Script path:
     - s3://wistia-video-analytics-at/scripts/wistia_transform_delta.py
 - Add job parameters
