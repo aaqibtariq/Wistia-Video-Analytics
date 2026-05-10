@@ -27,18 +27,25 @@ def load_data():
 
     query = """
         SELECT
-            media_id,
-            play_count,
-            play_rate,
-            engagement,
-            hours_watched,
-            visitors,
-            load_date,
-            engagement_date,
-            surrogate_key,
-            load_timestamp
-        FROM gold_fact_media_engagement
-        ORDER BY load_date DESC, media_id
+            f.media_id,
+            m.media_title,
+            m.duration,
+            m.status,
+            m.media_type,
+            f.play_count,
+            f.play_rate,
+            f.engagement,
+            f.hours_watched,
+            f.visitors,
+            f.load_date,
+            f.engagement_date,
+            f.surrogate_key,
+            f.load_timestamp
+        FROM gold_fact_media_engagement f
+        LEFT JOIN dim_media m
+            ON f.media_id = m.media_id
+            AND f.load_date = m.load_date
+        ORDER BY f.load_date DESC, f.media_id
     """
 
     return pd.read_sql(query, conn)
@@ -51,16 +58,25 @@ try:
 
     st.success("Connected to Athena successfully!")
 
-    # Filters
+    # Sidebar filters
     st.sidebar.header("Filters")
 
     selected_media = st.sidebar.multiselect(
-        "Select Media ID",
-        options=sorted(df["media_id"].unique()),
-        default=sorted(df["media_id"].unique())
+        "Select Media Title",
+        options=sorted(df["media_title"].dropna().unique()),
+        default=sorted(df["media_title"].dropna().unique())
     )
 
-    filtered_df = df[df["media_id"].isin(selected_media)]
+    selected_dates = st.sidebar.multiselect(
+        "Select Load Date",
+        options=sorted(df["load_date"].dt.date.unique()),
+        default=sorted(df["load_date"].dt.date.unique())
+    )
+
+    filtered_df = df[
+        (df["media_title"].isin(selected_media)) &
+        (df["load_date"].dt.date.isin(selected_dates))
+    ]
 
     # KPI Cards
     total_plays = int(filtered_df["play_count"].sum())
@@ -79,7 +95,25 @@ try:
 
     st.divider()
 
-    # Charts
+    # Media Metadata Section
+    st.subheader("🎬 Media Metadata")
+
+    metadata_cols = [
+        "media_id",
+        "media_title",
+        "duration",
+        "status",
+        "media_type"
+    ]
+
+    st.dataframe(
+        filtered_df[metadata_cols].drop_duplicates(),
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # Trend charts
     trend_df = (
         filtered_df
         .groupby("load_date", as_index=False)
@@ -108,16 +142,17 @@ try:
         st.subheader("🎥 Play Count by Media")
         media_play_df = (
             filtered_df
-            .groupby("media_id", as_index=False)["play_count"]
+            .groupby("media_title", as_index=False)["play_count"]
             .sum()
             .sort_values("play_count", ascending=False)
         )
 
         fig_media = px.bar(
             media_play_df,
-            x="media_id",
+            x="media_title",
             y="play_count",
-            title="Total Plays by Media"
+            title="Total Plays by Media",
+            text_auto=True
         )
         st.plotly_chart(fig_media, use_container_width=True)
 
@@ -125,16 +160,17 @@ try:
         st.subheader("👥 Visitors by Media")
         media_visitor_df = (
             filtered_df
-            .groupby("media_id", as_index=False)["visitors"]
+            .groupby("media_title", as_index=False)["visitors"]
             .sum()
             .sort_values("visitors", ascending=False)
         )
 
         fig_visitors = px.bar(
             media_visitor_df,
-            x="media_id",
+            x="media_title",
             y="visitors",
-            title="Total Visitors by Media"
+            title="Total Visitors by Media",
+            text_auto=True
         )
         st.plotly_chart(fig_visitors, use_container_width=True)
 
@@ -164,7 +200,8 @@ try:
 
     st.divider()
 
-    st.subheader("Gold Table Preview")
+    # Gold Table Preview
+    st.subheader("Gold Fact + Media Dimension Preview")
     st.dataframe(filtered_df, use_container_width=True)
 
 except Exception as e:
