@@ -17,13 +17,17 @@ DATABASE = "wistia_analytics"
 S3_STAGING_DIR = "s3://wistia-video-analytics-at/athena-results/"
 
 
-@st.cache_data(ttl=300)
-def load_data():
-    conn = connect(
+def get_connection():
+    return connect(
         s3_staging_dir=S3_STAGING_DIR,
         region_name=AWS_REGION,
         schema_name=DATABASE
     )
+
+
+@st.cache_data(ttl=300)
+def load_main_data():
+    conn = get_connection()
 
     query = """
         SELECT
@@ -51,10 +55,87 @@ def load_data():
     return pd.read_sql(query, conn)
 
 
+@st.cache_data(ttl=300)
+def load_engagement_curve():
+    conn = get_connection()
+
+    query = """
+        SELECT
+            c.media_id,
+            m.media_title,
+            c.load_date,
+            c.second_index,
+            c.engagement,
+            c.engagement_value,
+            c.rewatch_value
+        FROM gold_fact_engagement_curve c
+        LEFT JOIN dim_media m
+            ON c.media_id = m.media_id
+            AND c.load_date = m.load_date
+        ORDER BY c.media_id, c.second_index
+    """
+
+    return pd.read_sql(query, conn)
+
+
+@st.cache_data(ttl=300)
+def load_daily_stats():
+    conn = get_connection()
+
+    query = """
+        SELECT
+            d.media_id,
+            m.media_title,
+            d.load_date,
+            d.stat_date,
+            d.load_count,
+            d.play_count,
+            d.hours_watched
+        FROM gold_fact_media_daily_stats d
+        LEFT JOIN dim_media m
+            ON d.media_id = m.media_id
+            AND d.load_date = m.load_date
+        ORDER BY d.stat_date DESC, d.media_id
+    """
+
+    return pd.read_sql(query, conn)
+
+
+@st.cache_data(ttl=300)
+def load_inventory():
+    conn = get_connection()
+
+    query = """
+        SELECT
+            media_id,
+            media_title,
+            duration,
+            status,
+            media_type,
+            archived,
+            folder_name,
+            section,
+            created_at,
+            updated_at,
+            load_date
+        FROM gold_dim_media_inventory
+        ORDER BY updated_at DESC
+    """
+
+    return pd.read_sql(query, conn)
+
+
 try:
-    df = load_data()
+    df = load_main_data()
+    curve_df = load_engagement_curve()
+    daily_df = load_daily_stats()
+    inventory_df = load_inventory()
 
     df["load_date"] = pd.to_datetime(df["load_date"])
+    curve_df["load_date"] = pd.to_datetime(curve_df["load_date"])
+    daily_df["load_date"] = pd.to_datetime(daily_df["load_date"])
+    daily_df["stat_date"] = pd.to_datetime(daily_df["stat_date"])
+    inventory_df["load_date"] = pd.to_datetime(inventory_df["load_date"])
 
     st.success("Connected to Athena successfully!")
 
@@ -78,6 +159,16 @@ try:
         (df["load_date"].dt.date.isin(selected_dates))
     ]
 
+    filtered_curve_df = curve_df[
+        (curve_df["media_title"].isin(selected_media)) &
+        (curve_df["load_date"].dt.date.isin(selected_dates))
+    ]
+
+    filtered_daily_df = daily_df[
+        (daily_df["media_title"].isin(selected_media)) &
+        (daily_df["load_date"].dt.date.isin(selected_dates))
+    ]
+
     # KPI Cards
     total_plays = int(filtered_df["play_count"].sum())
     total_visitors = int(filtered_df["visitors"].sum())
@@ -95,25 +186,25 @@ try:
 
     st.divider()
 
-    # Media Metadata Section
-    st.subheader("🎬 Media Metadata")
-
-    metadata_cols = [
-        "media_id",
-        "media_title",
-        "duration",
-        "status",
-        "media_type"
-    ]
+    # Media Metadata
+    st.subheader("🎬 Selected Media Metadata")
 
     st.dataframe(
-        filtered_df[metadata_cols].drop_duplicates(),
+        filtered_df[
+            [
+                "media_id",
+                "media_title",
+                "duration",
+                "status",
+                "media_type"
+            ]
+        ].drop_duplicates(),
         use_container_width=True
     )
 
     st.divider()
 
-    # Trend charts
+    # Main trends
     trend_df = (
         filtered_df
         .groupby("load_date", as_index=False)
@@ -127,6 +218,7 @@ try:
     )
 
     st.subheader("📈 Plays Over Time")
+
     fig_plays = px.line(
         trend_df,
         x="load_date",
@@ -134,12 +226,14 @@ try:
         markers=True,
         title="Daily Play Count"
     )
+
     st.plotly_chart(fig_plays, use_container_width=True)
 
     col_a, col_b = st.columns(2)
 
     with col_a:
         st.subheader("🎥 Play Count by Media")
+
         media_play_df = (
             filtered_df
             .groupby("media_title", as_index=False)["play_count"]
@@ -154,10 +248,12 @@ try:
             title="Total Plays by Media",
             text_auto=True
         )
+
         st.plotly_chart(fig_media, use_container_width=True)
 
     with col_b:
         st.subheader("👥 Visitors by Media")
+
         media_visitor_df = (
             filtered_df
             .groupby("media_title", as_index=False)["visitors"]
@@ -172,12 +268,14 @@ try:
             title="Total Visitors by Media",
             text_auto=True
         )
+
         st.plotly_chart(fig_visitors, use_container_width=True)
 
     col_c, col_d = st.columns(2)
 
     with col_c:
         st.subheader("▶️ Play Rate Trend")
+
         fig_rate = px.line(
             trend_df,
             x="load_date",
@@ -185,10 +283,12 @@ try:
             markers=True,
             title="Average Play Rate Over Time"
         )
+
         st.plotly_chart(fig_rate, use_container_width=True)
 
     with col_d:
         st.subheader("⏱️ Hours Watched Trend")
+
         fig_hours = px.line(
             trend_df,
             x="load_date",
@@ -196,13 +296,65 @@ try:
             markers=True,
             title="Hours Watched Over Time"
         )
+
         st.plotly_chart(fig_hours, use_container_width=True)
 
     st.divider()
 
-    # Gold Table Preview
+    # Engagement curve
+    st.subheader("📉 Video Engagement Curve by Second")
+
+    fig_curve = px.line(
+        filtered_curve_df,
+        x="second_index",
+        y="engagement_value",
+        color="media_title",
+        title="Engagement Curve"
+    )
+
+    st.plotly_chart(fig_curve, use_container_width=True)
+
+    st.subheader("🔁 Rewatch Curve by Second")
+
+    fig_rewatch = px.line(
+        filtered_curve_df,
+        x="second_index",
+        y="rewatch_value",
+        color="media_title",
+        title="Rewatch Curve"
+    )
+
+    st.plotly_chart(fig_rewatch, use_container_width=True)
+
+    st.divider()
+
+    # Daily stats
+    st.subheader("📅 Media Daily Stats")
+
+    st.dataframe(
+        filtered_daily_df,
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # Gold preview
     st.subheader("Gold Fact + Media Dimension Preview")
-    st.dataframe(filtered_df, use_container_width=True)
+
+    st.dataframe(
+        filtered_df,
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # Inventory
+    st.subheader("📦 Full Media Inventory")
+
+    st.dataframe(
+        inventory_df,
+        use_container_width=True
+    )
 
 except Exception as e:
     st.error("Failed to load data from Athena.")
