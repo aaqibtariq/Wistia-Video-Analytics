@@ -669,3 +669,7 @@ Incremental Data Load – Second Pipeline Execution
 
 <p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/second%20load.png" width="750"/> </p>
 
+Amazon S3 – Transformed Data Output
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/S3%20after%20transform.png" width="750"/> </p>
+
