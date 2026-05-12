@@ -77,4 +77,14 @@ aws glue get-job-runs \
 
 ```
 
+# AWS Glue Workflow – Pipeline Setup
 
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20workflow%20setup%20Wista.png" width="750"/> </p>
+
+# AWS Glue Workflow – Execution Status
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20workflow%20status%20Wista.png" width="750"/> </p>
+
+# AWS Glue Workflow – Monitoring & Runtime Status
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/glue%20workflow%20status%20Wistaa.png" width="750"/> </p>
