@@ -70,3 +70,8 @@ SELECT COUNT(*) FROM wistia_analytics.gold_dim_media_inventory;
 
 
 ```
+
+
+# Amazon Athena – Wistia Analytics Tables
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/atehana%20tables%20for%20Wistia.png" width="750"/> </p>
