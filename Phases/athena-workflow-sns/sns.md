@@ -83,3 +83,7 @@ aws events list-targets-by-rule \
 
 ```
 
+
+# Amazon SNS – Workflow Notifications
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Ref%20Files/SNS%20for%20Wistia.png" width="750"/> </p>
