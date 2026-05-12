@@ -126,10 +126,19 @@ The platform calculates and visualizes several important video engagement metric
       
 - Phase 3	PySpark Data Transformation
     - [Phase 3: Glue PySpark Transformation](https://github.com/aaqibtariq/Wistia-Video-Analytics/blob/main/Phases/glue_job/Phase%203%3A%20Glue%20PySpark%20Transformation.md)
+      
 - Phase 4	Amazon Athena External Table Setup
+    - [Athena Queries & Analytics](https://github.com/aaqibtariq/Wistia-Video-Analytics/blob/main/Phases/athena-workflow-sns/Athena.md)
+      
 - Phase 5	AWS Glue Workflow Orchestration
-- Phase 6	EventBridge Workflow Scheduling
-- Phase 7	SNS Monitoring and Alerts
-- Phase 8	Streamlit Dashboard Deployment on EC2
-- Phase 9	Business Analytics Visualization
-- Phase 10	Monitoring, Logging, and Optimization
+    - [Glue Workflow Configuration](https://github.com/aaqibtariq/Wistia-Video-Analytics/blob/main/Phases/athena-workflow-sns/workflow.md)
+      
+- Phase 6	SNS Monitoring and Alerts
+    - [SNS Alerts & Notifications](https://github.com/aaqibtariq/Wistia-Video-Analytics/blob/main/Phases/athena-workflow-sns/sns.md)
+      
+- Phase 7	Streamlit Dashboard Deployment on EC2
+    - [EC2 Setup & Configuration](https://github.com/aaqibtariq/Wistia-Video-Analytics/blob/main/Phases/AWS%20setup/EC2.md)
+    - [Streamlit Application](https://github.com/aaqibtariq/Wistia-Video-Analytics/tree/main/Phases/streamlit)
+      
+- Phase 8	Business Analytics Visualization
+    - [Dashboard Visualizations](https://github.com/aaqibtariq/Wistia-Video-Analytics/tree/main/Phases/Dashboards)
