@@ -44,6 +44,9 @@ The system is orchestrated using AWS Glue Workflow, while operational monitoring
 
 The architecture follows modern cloud-native and serverless data engineering practices designed for scalability, automation, monitoring, and business intelligence reporting.
 
+## End-to-End System Design – Wistia Video Analytics Platform
+
+<p align="center"> <img src="https://raw.githubusercontent.com/aaqibtariq/Wistia-Video-Analytics/main/Phases/Architecture/SD%20for%20Wistia.png" width="850"/> </p>
 
 ## Architecture Components
 
